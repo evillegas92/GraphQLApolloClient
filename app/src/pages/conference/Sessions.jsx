@@ -6,8 +6,8 @@ import { gql, useQuery } from "@apollo/client";
 
 /* Define queries, mutations and fragments here */
 const SESSIONS_QUERY = gql`
-  query sessions {
-    sessions {
+  query sessions($day: String!) {
+    sessions(day: $day) {
       id
       title
       day
@@ -22,11 +22,16 @@ function AllSessionList() {
    return <SessionItem />
 }
 
-function SessionList () {
+function SessionList ({ day }) {
   /* Invoke useQuery hook here to retrieve sessions per day and call SessionItem */
-  const { loading, data } = useQuery(SESSIONS_QUERY);
+  const { loading, error, data } = useQuery(SESSIONS_QUERY, {
+    variables: { day }
+  });
   if (loading) {
     return <p>Loading sessions information...</p>
+  }
+  if (error) {
+    return <p>There was an error loading the sessions.</p>
   }
   return data.sessions.map((session) => (
     <SessionItem 
