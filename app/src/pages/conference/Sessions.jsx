@@ -2,8 +2,20 @@ import React, {useState} from "react";
 import "./style-sessions.css";
 import { Link } from "react-router-dom"
 import { Formik, Field, Form } from "formik"
+import { gql, useQuery } from "@apollo/client";
 
-/* ---> Define queries, mutations and fragments here */
+/* Define queries, mutations and fragments here */
+const SESSIONS_QUERY = gql`
+  query sessions {
+    sessions {
+      id
+      title
+      day
+      room
+      level
+    }
+  }
+`;
 
 function AllSessionList() {
    /* ---> Invoke useQuery hook here to retrieve all sessions and call SessionItem */
@@ -11,23 +23,30 @@ function AllSessionList() {
 }
 
 function SessionList () {
-  /* ---> Invoke useQuery hook here to retrieve sessions per day and call SessionItem */
-  return <SessionItem />
+  /* Invoke useQuery hook here to retrieve sessions per day and call SessionItem */
+  const { loading, data } = useQuery(SESSIONS_QUERY);
+  if (loading) {
+    return <p>Loading sessions information...</p>
+  }
+  return data.sessions.map((session) => (
+    <SessionItem 
+      key={session.id}
+      session={{...session}}/>
+  ));
 }
 
-function SessionItem() {
-
-  /* ---> Replace hard coded session values with data that you get back from GraphQL server here */
+function SessionItem({ session }) {
+  const { id, title, day, room, level } = session;
   return (
-    <div key={'id'} className="col-xs-12 col-sm-6" style={{ padding: 5 }}>
+    <div key={id} className="col-xs-12 col-sm-6" style={{ padding: 5 }}>
       <div className="panel panel-default">
         <div className="panel-heading">
-          <h3 className="panel-title">{"title"}</h3>
-          <h5>{`Level: `}</h5>
+          <h3 className="panel-title">{title}</h3>
+          <h5>{`Level: ${level}`}</h5>
         </div>
         <div className="panel-body">
-          <h5>{`Day: `}</h5>
-          <h5>{`Room Number: `}</h5>
+          <h5>{`Day: ${day}`}</h5>
+          <h5>{`Room Number: ${room}`}</h5>
           <h5>{`Starts at: `}</h5>
         </div>
         <div className="panel-footer">
@@ -38,7 +57,6 @@ function SessionItem() {
 }
 
 export function Sessions() {
-
   const [day, setDay] = useState("");
   return (
     <>
