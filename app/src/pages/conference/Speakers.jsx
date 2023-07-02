@@ -1,20 +1,37 @@
 import * as React from "react";
+import { useParams } from "react-router-dom";
 import "./style-sessions.css";
 import { gql, useQuery } from "@apollo/client";
 
 /* Define queries, mutations and fragments here */
+const SPEAKER_ATTRIBUTES = gql`
+  fragment SpeakerInfo on Speaker {
+    id
+    bio
+    name
+    sessions {
+      id
+      title
+    }
+  }
+`;
+
 const SPEAKERS_QUERY = gql`
   query speakers {
     speakers {
-      id
-      name
-      bio
-      sessions {
-        id
-        title
-      }
+      ...SpeakerInfo
     }
   }
+  ${SPEAKER_ATTRIBUTES}
+`;
+
+const SPEAKER_BY_ID_QUERY = gql`
+  query speakerById($id: ID!) {
+    speakerById(id: $id) {
+      ...SpeakerInfo
+    }
+  }
+  ${SPEAKER_ATTRIBUTES}
 `;
 
 const SpeakerList = () => {
@@ -75,21 +92,34 @@ const SpeakerList = () => {
 };
 
 const SpeakerDetails = () => {
+  const { speaker_id } = useParams();
+  const { loading, error, data } = useQuery(SPEAKER_BY_ID_QUERY, {
+    variables: { id: speaker_id },
+  });
 
-    /* ---> Replace hardcoded speaker values with data that you get back from GraphQL server here */
+  if (loading) {
+    return <p>Loading speaker...</p>;
+  }
+  if (error) {
+    return <p>Error loading the speaker information...</p>
+  }
+
+  const speaker = data.speakerById;
+  const { id, name, bio, sessions } = speaker;
+
   return (
-    <div key={'id'} className="col-xs-12" style={{ padding: 5 }}>
+    <div key={id} className="col-xs-12" style={{ padding: 5 }}>
       <div className="panel panel-default">
         <div className="panel-heading">
-          <h3 className="panel-title">{'name'}</h3>
+          <h3 className="panel-title">{ name }</h3>
         </div>
         <div className="panel-body">
-          <h5>{'bio'}</h5>
+          <h5>{ bio }</h5>
         </div>
         <div className="panel-footer">
-          {{
-						/* ---> Loop through speaker's sessions here */
-					}}
+          { sessions.map(({ id, title }) => (
+            <p key={id}>{title}</p>
+          )) }
         </div>
       </div>
     </div>

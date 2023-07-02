@@ -13,6 +13,10 @@ const SESSIONS_QUERY = gql`
       day
       room
       level
+      speakers {
+        id
+        name
+      }
     }
   }
 `;
@@ -41,7 +45,7 @@ function SessionList ({ day }) {
 }
 
 function SessionItem({ session }) {
-  const { id, title, day, room, level } = session;
+  const { id, title, day, room, level, speakers } = session;
   return (
     <div key={id} className="col-xs-12 col-sm-6" style={{ padding: 5 }}>
       <div className="panel panel-default">
@@ -55,6 +59,13 @@ function SessionItem({ session }) {
           <h5>{`Starts at: `}</h5>
         </div>
         <div className="panel-footer">
+          { speakers.map(({ id, name }) => (
+            <span key={id} style={{ padding: 2 }}>
+              <Link className="btn btn-default btn-lg" to={`/conference/speaker/${id}`}>
+                View {name}'s profile
+              </Link>
+            </span>
+          )) }
         </div>
       </div>
     </div>
