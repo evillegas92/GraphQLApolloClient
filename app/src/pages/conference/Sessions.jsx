@@ -13,6 +13,7 @@ const SESSIONS_FRAGMENT = gql`
     startsAt
     room
     level
+    description @include(if: $includeDescription)
     speakers {
       id
       name
@@ -21,7 +22,7 @@ const SESSIONS_FRAGMENT = gql`
 `;
 
 const SESSIONS_QUERY = gql`
-  query sessions($day: String!) {
+  query sessions($day: String!, $includeDescription: Boolean!) {
     intro: sessions(day: $day, level: "Introductory and overview") {
       ...SessionInfo
     }
@@ -41,9 +42,11 @@ function AllSessionList() {
 }
 
 function SessionList ({ day }) {
-  /* Invoke useQuery hook here to retrieve sessions per day and call SessionItem */
+  if (day == "") {
+    day = "Wednesday";
+  }
   const { loading, error, data } = useQuery(SESSIONS_QUERY, {
-    variables: { day }
+    variables: { day, includeDescription: true }
   });
   if (loading) {
     return <p>Loading sessions information...</p>
@@ -76,7 +79,7 @@ function SessionList ({ day }) {
 }
 
 function SessionItem({ session }) {
-  const { id, title, day, startsAt, room, level, speakers } = session;
+  const { id, title, day, startsAt, room, level, description, speakers } = session;
   return (
     <div key={id} className="col-xs-12 col-sm-6" style={{ padding: 5 }}>
       <div className="panel panel-default">
@@ -88,6 +91,7 @@ function SessionItem({ session }) {
           <h5>{`Day: ${day}`}</h5>
           <h5>{`Room Number: ${room}`}</h5>
           <h5>{`Starts at: ${startsAt}`}</h5>
+          { description && <p>{ description }</p> }
         </div>
         <div className="panel-footer">
           { speakers.map(({ id, name }) => (
