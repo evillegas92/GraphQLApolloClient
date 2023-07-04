@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useParams } from "react-router-dom";
 import "./style-sessions.css";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 
 /* Define queries, mutations and fragments here */
 const SPEAKER_ATTRIBUTES = gql`
@@ -13,6 +13,7 @@ const SPEAKER_ATTRIBUTES = gql`
       id
       title
     }
+    featured
   }
 `;
 
@@ -34,8 +35,19 @@ const SPEAKER_BY_ID_QUERY = gql`
   ${SPEAKER_ATTRIBUTES}
 `;
 
+const FEATURE_SPEAKER_MUTATION = gql`
+  mutation markFeatured($speakerId: ID!, $featured: Boolean!) {
+    markFeatured(speakerId: $speakerId, featured: $featured) {
+      id
+      name
+    }
+  }
+`;
+
 const SpeakerList = () => {
   const { loading, error, data } = useQuery(SPEAKERS_QUERY);
+  const [markFeatured] = useMutation(FEATURE_SPEAKER_MUTATION);
+
   const featured = false;
 
   if (loading) {
@@ -46,49 +58,54 @@ const SpeakerList = () => {
   }
 
   return data.speakers.map(({ id, name, bio, sessions }) => (
-		<div
+    <div
       key={id}
       className="col-xs-12 col-sm-6 col-md-6"
       style={{ padding: 5 }}
     >
       <div className="panel panel-default">
         <div className="panel-heading">
-          <h3 className="panel-title">{ name }</h3>
+          <h3 className="panel-title">{name}</h3>
         </div>
         <div className="panel-body">
-          <h5>{ bio }</h5>
+          <h5>{bio}</h5>
         </div>
         <div className="panel-footer">
           <h4>Sessions</h4>
-					{
-						sessions.map((session) => (
+          {
+            sessions.map((session) => (
               <span key={session.id} style={{ padding: 2 }}>
-                <p>{ session.title }</p>
+                <p>{session.title}</p>
               </span>
             ))
-					}
-          <span>	
-            <button	
-              type="button"	
-              className="btn btn-default btn-lg"	
-              onClick={()=> {
-                /* ---> Call useMutation's mutate function to mark speaker as featured */
-              }}	
-              >	
-                <i	
-                  className={`fa ${featured ? "fa-star" : "fa-star-o"}`}	
-                  aria-hidden="true"	
-                  style={{	
-                    color: featured ? "gold" : undefined,	
-                  }}	
-                ></i>{" "}	
-                Featured Speaker	
-            </button>	
+          }
+          <span>
+            <button
+              type="button"
+              className="btn btn-default btn-lg"
+              onClick={async () => {
+                await markFeatured({
+                  variables: {
+                    speakerId: id,
+                    featured: true
+                  }
+                })
+              }}
+            >
+              <i
+                className={`fa ${featured ? "fa-star" : "fa-star-o"}`}
+                aria-hidden="true"
+                style={{
+                  color: featured ? "gold" : undefined,
+                }}
+              ></i>{" "}
+              Featured Speaker
+            </button>
           </span>
         </div>
       </div>
     </div>
-	));
+  ));
 };
 
 const SpeakerDetails = () => {
@@ -111,15 +128,15 @@ const SpeakerDetails = () => {
     <div key={id} className="col-xs-12" style={{ padding: 5 }}>
       <div className="panel panel-default">
         <div className="panel-heading">
-          <h3 className="panel-title">{ name }</h3>
+          <h3 className="panel-title">{name}</h3>
         </div>
         <div className="panel-body">
-          <h5>{ bio }</h5>
+          <h5>{bio}</h5>
         </div>
         <div className="panel-footer">
-          { sessions.map(({ id, title }) => (
+          {sessions.map(({ id, title }) => (
             <p key={id}>{title}</p>
-          )) }
+          ))}
         </div>
       </div>
     </div>
