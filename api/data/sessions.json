@@ -3637,6 +3637,13 @@
       "level": "Advanced",
       "day": "Friday",
       "id": "c72e8a15-b986-4f64-b045-a88cf0363c46"
+    },
+    {
+      "title": "User-created Session 2",
+      "description": "Session created by user",
+      "level": "Advanced",
+      "day": "Friday",
+      "id": "41fdf6a5-78fa-4f56-b56c-87eb5faf4374"
     }
   ]
 }

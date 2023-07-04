@@ -154,7 +154,15 @@ export function Sessions() {
 
 export function SessionForm() {
 
-  const [createSession, data] = useMutation(CREATE_SESSION_MUTATION);
+  const [createSession, { called, error }] = useMutation(CREATE_SESSION_MUTATION);
+
+  if (called) {
+    return <p>Data submitted successfully.</p>
+  }
+
+  if (error) {
+    return <p>There was an error submitting the data.</p>
+  }
 
   return (
     <div
