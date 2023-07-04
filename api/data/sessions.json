@@ -3630,6 +3630,13 @@
       "level": "Intermediate",
       "day": "Thursday",
       "id": "814b1f5e-e6df-440b-a91c-df198b5bbed2"
+    },
+    {
+      "title": "User-created session 1",
+      "description": "Session created by user",
+      "level": "Advanced",
+      "day": "Friday",
+      "id": "c72e8a15-b986-4f64-b045-a88cf0363c46"
     }
   ]
 }
