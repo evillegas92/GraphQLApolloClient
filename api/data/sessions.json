@@ -3644,6 +3644,13 @@
       "level": "Advanced",
       "day": "Friday",
       "id": "41fdf6a5-78fa-4f56-b56c-87eb5faf4374"
+    },
+    {
+      "title": "Cache Update Test 1",
+      "description": "Cache Update Test 1",
+      "level": "Advanced",
+      "day": "Friday",
+      "id": "fc707e3f-6042-4edb-a6ce-b9d0817610a4"
     }
   ]
 }

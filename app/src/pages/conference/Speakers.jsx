@@ -39,7 +39,7 @@ const FEATURE_SPEAKER_MUTATION = gql`
   mutation markFeatured($speakerId: ID!, $featured: Boolean!) {
     markFeatured(speakerId: $speakerId, featured: $featured) {
       id
-      name
+      featured
     }
   }
 `;
@@ -48,8 +48,6 @@ const SpeakerList = () => {
   const { loading, error, data } = useQuery(SPEAKERS_QUERY);
   const [markFeatured] = useMutation(FEATURE_SPEAKER_MUTATION);
 
-  const featured = false;
-
   if (loading) {
     return <p>Loading speakers...</p>
   }
@@ -57,7 +55,7 @@ const SpeakerList = () => {
     return <p>Error fetching speakers...</p>
   }
 
-  return data.speakers.map(({ id, name, bio, sessions }) => (
+  return data.speakers.map(({ id, name, bio, sessions, featured }) => (
     <div
       key={id}
       className="col-xs-12 col-sm-6 col-md-6"

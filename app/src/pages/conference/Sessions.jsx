@@ -36,13 +36,22 @@ const SESSIONS_QUERY = gql`
   ${SESSIONS_FRAGMENT}
 `;
 
-const CREATE_SESSION_MUTATION = gql`
-  mutation createSession($session: SessionInput!) {
-    createSession(session: $session) {
-      id
-      title
+const ALL_SESSIONS_QUERY = gql`
+  query sessions($includeDescription: Boolean!) {
+    sessions {
+      ...SessionInfo
     }
   }
+  ${SESSIONS_FRAGMENT}
+`;
+
+const CREATE_SESSION_MUTATION = gql`
+  mutation createSession($session: SessionInput!, $includeDescription: Boolean!) {
+    createSession(session: $session) {
+      ...SessionInfo
+    }
+  }
+  ${SESSIONS_FRAGMENT}
 `;
 
 function AllSessionList() {
@@ -154,7 +163,26 @@ export function Sessions() {
 
 export function SessionForm() {
 
-  const [createSession, { called, error }] = useMutation(CREATE_SESSION_MUTATION);
+  const updateSessions = (cache, { data }) => {
+    cache.modify({
+      fields: {
+        sessions(existingSessions = []) {
+          const newSession = data.createSession;
+          cache.writeQuery({
+            query: ALL_SESSIONS_QUERY,
+            data: { newSession, ...existingSessions }
+          })
+        }
+      }
+    });
+  }
+
+  const [createSession, { called, error }] = useMutation(CREATE_SESSION_MUTATION, {
+    update: updateSessions,
+    variables: {
+      includeDescription: true
+    }
+  });
 
   if (called) {
     return <p>Data submitted successfully.</p>
@@ -184,7 +212,8 @@ export function SessionForm() {
         onSubmit={async (values) => {
           await createSession({
             variables: {
-              session: values
+              session: values,
+              includeDescription: true
             }
           });
         }}
